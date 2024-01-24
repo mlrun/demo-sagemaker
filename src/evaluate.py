@@ -38,6 +38,8 @@ def evaluate(
     factorize_key: dict = FACTORIZE_KEY,
 ) -> pd.DataFrame:
     # download model from s3:
+    if model_path.startswith("store://"):
+        model_path = mlrun.get_dataitem(model_path).get().decode("utf-8") 
     model_temp_path = _download_object_from_s3(model_path, suffix=".tar.gz")
 
     # extract model file:
@@ -52,7 +54,7 @@ def evaluate(
 
     # convert to pandas dataframe:
     test_set = pd.read_csv(test_set_temp_path)
-
+    
     # convert to xgboost object:
     test_data = xgb.DMatrix(test_set.drop(columns=[label_column], axis=1))
 
