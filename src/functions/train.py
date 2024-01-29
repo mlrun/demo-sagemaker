@@ -1,7 +1,6 @@
 import os
 
 import boto3
-import mlrun
 import mlrun.feature_store as fs
 import numpy as np
 import sagemaker
@@ -12,7 +11,7 @@ def train(context):
     _set_envars(context)
 
     # Get data from feature-store:
-    data = _get_feature_store_data()
+    data = _get_feature_store_data(context)
 
     # Randomly sort the data then split out first 70%, second 20%, and last 10%
     train_data, validation_data, test_data = np.split(
@@ -91,7 +90,7 @@ def train(context):
     context.log_artifact("model_path", body=xgb.model_data)
 
     # Save the test data path:
-    context.log_artifact("test_data", body=os.path.join(bucket_prefix, "test/test.csv"))
+    context.log_artifact("test_data", body="s3://{}/{}/test/test.csv".format(s3_bucket, bucket_prefix))
 
 
 def _set_envars(context):
@@ -101,11 +100,10 @@ def _set_envars(context):
     os.environ["SAGEMAKER-ROLE"] = context.get_secret("SAGEMAKER-ROLE")
 
 
-def _get_feature_store_data():
-    project = mlrun.get_current_project()
-
+def _get_feature_store_data(context):
+    project_name = context.project
     features = [
-        f"{project.name}/transactions.*",
+        f"{project_name}/transactions.*",
     ]
 
     vector = fs.FeatureVector(
