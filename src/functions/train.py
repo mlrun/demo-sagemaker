@@ -90,7 +90,9 @@ def train(context):
     context.log_artifact("model_path", body=xgb.model_data)
 
     # Save the test data path:
-    context.log_artifact("test_data", body="s3://{}/{}/test/test.csv".format(s3_bucket, bucket_prefix))
+    context.log_artifact(
+        "test_data", body="s3://{}/{}/test/test.csv".format(s3_bucket, bucket_prefix)
+    )
 
 
 def _set_envars(context):

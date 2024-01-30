@@ -13,7 +13,8 @@ warnings.filterwarnings("ignore")
 class XGBModelServer(mlrun.serving.V2ModelServer):
     def load(self):
         """load and initialize the model and/or other elements"""
-
+        if not self.model_path:
+            self._set_model_path()
         # Download the model file:
         model_file, extra_data = self.get_model(".tar.gz")
 
@@ -36,6 +37,19 @@ class XGBModelServer(mlrun.serving.V2ModelServer):
         # Perform prediction:
         result: np.ndarray = self.model.predict(data)
         return result.tolist()
+
+    def _set_model_path(self):
+        # Get project:
+        context = mlrun.get_or_create_ctx("mlrun")
+        project_name = context.project
+        project = mlrun.get_or_create_project(project_name)
+
+        # get model path from artifact:
+        model_path_artifact = project.get_artifact("train_model_path")
+        model_path = model_path_artifact.to_dataitem().get().decode("utf-8")
+
+        # set model path:
+        self.model_path = model_path
 
 
 def postprocess(inputs: dict) -> dict:

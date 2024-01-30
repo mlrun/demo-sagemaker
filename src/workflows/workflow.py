@@ -27,25 +27,24 @@ def kfpipeline():
         params={
             "model_path": train_run.outputs["model_path"],
             "model_name": "xgboost-model",
-            # "test_set": train_run.outputs['test_data'],
             "label_column": "transaction_category",
         },
         returns=["classification_report: dataset"],
     )
 
+    serving_function = project.get_function("serving")
 
-#     serving_function = project.get_function("serving")
+    if serving_function.spec.graph is not None:
+        # If serving graph is already set, we need to remove it and set it again:
+        serving_function = project.set_function(serving_function)
 
-#     with dsl.Condition(serving_function.spec.graph is None) as build_graph:
-#     # if serving_function.spec.graph is None:
-#         # Set the topology and get the graph object:
-#         graph = serving_function.set_topology("flow", engine="async")
+    # Set the topology and get the graph object:
+    graph = serving_function.set_topology("flow", engine="async")
 
-#         # Add the steps:
-#         graph.to("XGBModelServer",
-#                  name="xgboost-model",
-#                  model_path=train_run.outputs['model_path'])\
-#         .to(handler="postprocess", name="postprocess").respond()
+    # Add the steps:
+    graph.to("XGBModelServer", name="xgboost-model").to(
+        handler="postprocess", name="postprocess"
+    ).respond()
 
-#     # Deploy the serving function:
-#     project.deploy_function(serving_function).after(train_run)
+    # Deploy the serving function:
+    project.deploy_function(serving_function).after(train_run)
