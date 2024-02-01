@@ -63,10 +63,6 @@ def preprocess(data: pd.Dataframe):
         resp = online_feature_service.get(
             [{"transaction_category":cat} for cat in unique_categories]
         )
-    # @@@@@@@@@@ Remove this when bug is fixed @@@@@@@@@@@@@@@
-    #---------------------------------------------------------------------------
-    resp = [{'transaction_category': i['transaction_category'], 'amount_avg_1d': 100} for i in resp]
-    #---------------------------------------------------------------------------
     
     for cat in resp:
         transaction_category = cat['transaction_category']
