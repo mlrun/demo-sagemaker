@@ -4,6 +4,7 @@ from typing import List
 
 import mlrun
 import numpy as np
+import pandas as pd
 import xgboost as xgb
 from cloudpickle import load
 
@@ -50,6 +51,39 @@ class XGBModelServer(mlrun.serving.V2ModelServer):
 
         # set model path:
         self.model_path = model_path
+        
+# Function that preprocesses the inference data
+def preprocess(data: pd.Dataframe):
+    unique_categories = data.transaction_category.unique()
+    # Create a feature vector that gets the average amount
+    vector = fstore.FeatureVector("transactions_vector", ["aggregations.amount_avg_1d"], with_indexes=True)
+
+    # Use online feature service to get the latest average amount per category
+    with vector.get_online_feature_service() as online_feature_service:
+        resp = online_feature_service.get(
+            [{"transaction_category":cat} for cat in unique_categories]
+        )
+    
+    for cat in resp:
+        transaction_category = cat['transaction_category']
+        amount_avg = cat['amount_avg_1d']
+        data["dist_" + transaction_category] = abs(amount_avg - data["amount"])
+    
+    # convert timestamp to components
+    data["year"] = data["timestamp"].dt.year
+    data["month"] = data["timestamp"].dt.month
+    data["day"] = data["timestamp"].dt.day
+    data["hour"] = data["timestamp"].dt.hour
+    data["minute"] = data["timestamp"].dt.minute
+    data["second"] = data["timestamp"].dt.second
+
+    del data["timestamp"]
+    del data["transaction_category"]
+    
+    return data
+    
+    
+
 
 
 def postprocess(inputs: dict) -> dict:
