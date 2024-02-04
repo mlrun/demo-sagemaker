@@ -8,6 +8,8 @@ import pandas as pd
 import xgboost as xgb
 from cloudpickle import load
 
+import mlrun.feature_store as fstore
+
 warnings.filterwarnings("ignore")
 
 
@@ -53,7 +55,7 @@ class XGBModelServer(mlrun.serving.V2ModelServer):
         self.model_path = model_path
         
 # Function that preprocesses the inference data
-def preprocess(data: pd.Dataframe):
+def preprocess(self, data: pd.Dataframe):
     unique_categories = data.transaction_category.unique()
     # Create a feature vector that gets the average amount
     vector = fstore.FeatureVector("transactions_vector", ["aggregations.amount_avg_1d"], with_indexes=True)
