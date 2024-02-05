@@ -4,11 +4,10 @@ from typing import List
 
 import mlrun
 import numpy as np
-import pandas as pd
 import xgboost as xgb
 from cloudpickle import load
-
 import mlrun.feature_store as fstore
+
 
 warnings.filterwarnings("ignore")
 
@@ -53,39 +52,6 @@ class XGBModelServer(mlrun.serving.V2ModelServer):
 
         # set model path:
         self.model_path = model_path
-        
-# Function that preprocesses the inference data
-def preprocess(self, data: pd.Dataframe):
-    unique_categories = data.transaction_category.unique()
-    # Create a feature vector that gets the average amount
-    vector = fstore.FeatureVector("transactions_vector", ["aggregations.amount_avg_1d"], with_indexes=True)
-
-    # Use online feature service to get the latest average amount per category
-    with vector.get_online_feature_service() as online_feature_service:
-        resp = online_feature_service.get(
-            [{"transaction_category":cat} for cat in unique_categories]
-        )
-    
-    for cat in resp:
-        transaction_category = cat['transaction_category']
-        amount_avg = cat['amount_avg_1d']
-        data["dist_" + transaction_category] = abs(amount_avg - data["amount"])
-    
-    # convert timestamp to components
-    data["year"] = data["timestamp"].dt.year
-    data["month"] = data["timestamp"].dt.month
-    data["day"] = data["timestamp"].dt.day
-    data["hour"] = data["timestamp"].dt.hour
-    data["minute"] = data["timestamp"].dt.minute
-    data["second"] = data["timestamp"].dt.second
-
-    del data["timestamp"]
-    del data["transaction_category"]
-    
-    return data
-    
-    
-
 
 
 def postprocess(inputs: dict) -> dict:
@@ -108,3 +74,40 @@ def postprocess(inputs: dict) -> dict:
     inputs["predictions"] = predictions
     inputs["confidences"] = confidences
     return inputs
+
+# Function that preprocesses the inference data
+def preprocess(event):    
+    print("--------------------")
+    print(event)
+  
+    # Create a feature vector that gets the average amount
+    vector = fstore.FeatureVector("transactions_vector", ["aggregations.amount_avg_1d"], with_indexes=True)
+    unique_categories = ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"]
+    # Use online feature service to get the latest average amount per category
+    with vector.get_online_feature_service() as online_feature_service:
+        resp = online_feature_service.get(
+            [{"transaction_category":cat} for cat in unique_categories]
+        )
+
+    print('---------')
+    print(resp)
+    
+    for cat in resp:
+        transaction_category = cat['transaction_category']        
+        amount_avg = cat['amount_avg_1d']
+        event[0]["dist_" + transaction_category] = abs(amount_avg - event[0]["amount"])
+
+    print(event)
+    # # convert timestamp to components
+    # event["year"] = event["timestamp"].dt.year
+    # event["month"] = event["timestamp"].dt.month
+    # event["day"] = event["timestamp"].dt.day
+    # event["hour"] = event["timestamp"].dt.hour
+    # event["minute"] = event["timestamp"].dt.minute
+    # event["second"] = event["timestamp"].dt.second
+
+    # del data["timestamp"]
+    # del data["transaction_category"]
+    event_list = list(list(event[0].values()))
+    
+    return event_list
