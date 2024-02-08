@@ -127,5 +127,6 @@ def preprocess(event):
     values_list = list(restructured_event[0].values())
     return_list = [values_list]
     return_list
-    return return_list
+    return_dict = {"inputs": return_list}
+    return return_dict
     

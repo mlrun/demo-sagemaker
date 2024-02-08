@@ -23,9 +23,9 @@ def update_timestamps(data):
             times.append(datetime(year, month, day, hour))
 
     # Iterate over each transaction category
-    for i in range(len(data["transaction_category"].unique())):
+    for i in range(len(data["transaction_category_key"].unique())):
         # Extract all the rows for each category
-        category_data = data[data['transaction_category'] == str(i)]
+        category_data = data[data['transaction_category_key'] == str(i)]
 
         # Ensure timestamp is a datetime object
         pd.to_datetime(category_data.timestamp)
@@ -40,7 +40,7 @@ def update_timestamps(data):
         # Update the initial dataframe to include those updated rows
         data.update(latest_rows)
 
-        data.sort_values(["transaction_category", "timestamp"], inplace=True)
+        data.sort_values(["transaction_category_key", "timestamp"], inplace=True)
 
 
     return data
