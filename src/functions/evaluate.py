@@ -67,7 +67,7 @@ def evaluate(
 
     # generate classification report:
     report = classification_report(
-        y_true=test_set["transaction_category"].to_list(),
+        y_true=test_set["transaction_category_mapped"].to_list(),
         y_pred=predictions,
         target_names=factorize_key,
         output_dict=True,
