@@ -56,6 +56,8 @@ def evaluate(
     # convert to pandas dataframe:
     test_set = pd.read_csv(test_set_temp_path)
 
+    print(test_set)
+
     # convert to xgboost object:
     test_data = xgb.DMatrix(test_set.drop(columns=[label_column], axis=1))
 
@@ -67,7 +69,7 @@ def evaluate(
 
     # generate classification report:
     report = classification_report(
-        y_true=test_set["transaction_category_mapped"].to_list(),
+        y_true=test_set["transaction_category"].to_list(),
         y_pred=predictions,
         target_names=factorize_key,
         output_dict=True,
