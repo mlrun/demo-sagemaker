@@ -4,9 +4,10 @@ from typing import List
 
 import mlrun
 import numpy as np
-import pandas as pd
 import xgboost as xgb
 from cloudpickle import load
+import mlrun.feature_store as fstore
+
 
 warnings.filterwarnings("ignore")
 
@@ -28,6 +29,13 @@ class XGBModelServer(mlrun.serving.V2ModelServer):
 
     def predict(self, body: dict) -> List:
         """Generate model predictions from sample."""
+
+        print(body)
+        # body['inputs'][0] = body['inputs'][0][1:]
+
+        # print(body)
+
+
 
         # Convert input to numpy array:
         data = np.asarray(body["inputs"])
@@ -51,39 +59,6 @@ class XGBModelServer(mlrun.serving.V2ModelServer):
 
         # set model path:
         self.model_path = model_path
-        
-# Function that preprocesses the inference data
-def preprocess(data: pd.Dataframe):
-    unique_categories = data.transaction_category.unique()
-    # Create a feature vector that gets the average amount
-    vector = fstore.FeatureVector("transactions_vector", ["aggregations.amount_avg_1d"], with_indexes=True)
-
-    # Use online feature service to get the latest average amount per category
-    with vector.get_online_feature_service() as online_feature_service:
-        resp = online_feature_service.get(
-            [{"transaction_category":cat} for cat in unique_categories]
-        )
-    
-    for cat in resp:
-        transaction_category = cat['transaction_category']
-        amount_avg = cat['amount_avg_1d']
-        data["dist_" + transaction_category] = abs(amount_avg - data["amount"])
-    
-    # convert timestamp to components
-    data["year"] = data["timestamp"].dt.year
-    data["month"] = data["timestamp"].dt.month
-    data["day"] = data["timestamp"].dt.day
-    data["hour"] = data["timestamp"].dt.hour
-    data["minute"] = data["timestamp"].dt.minute
-    data["second"] = data["timestamp"].dt.second
-
-    del data["timestamp"]
-    del data["transaction_category"]
-    
-    return data
-    
-    
-
 
 
 def postprocess(inputs: dict) -> dict:
@@ -106,3 +81,59 @@ def postprocess(inputs: dict) -> dict:
     inputs["predictions"] = predictions
     inputs["confidences"] = confidences
     return inputs
+
+# def get_realtime_transactions_aggregations():
+#     # Create a feature vector that gets the average amount
+#     vector = fstore.FeatureVector("aggregations-vector", ["aggregations.amount_avg_1d"], with_indexes=True)
+#     #get the categories list
+#     unique_categories = ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"]
+#     # Use online feature service to get the latest average amount per category
+#     with vector.get_online_feature_service() as online_feature_service:
+#         resp = online_feature_service.get(
+#             [{"transaction_category":cat} for cat in unique_categories]
+#         )
+#     return resp
+
+# def calculate_distances(resp, event):
+#     for cat in resp:
+#         transaction_category = cat['transaction_category']        
+#         amount_avg = cat['amount_avg_1d']
+#         event[0]["dist_" + transaction_category] = abs(amount_avg - event[0]["amount"])
+
+#     return event
+
+# def convert_timestamp_to_components(event):
+#     event[0]["year"] = event[0]["timestamp"].year
+#     event[0]["month"] = event[0]["timestamp"].month
+#     event[0]["day"] = event[0]["timestamp"].day
+#     event[0]["hour"] = event[0]["timestamp"].hour
+#     event[0]["minute"] = event[0]["timestamp"].minute
+#     event[0]["second"] = event[0]["timestamp"].second
+#     del event[0]['timestamp']
+
+#     return event
+
+# def move_to_end(ls, key):
+#     """Move an item to the end of the dictionary."""
+#     d = ls[0]
+#     if key in d:
+#         value = d.pop(key)  # Remove the item and get its value
+#         d[key] = value  # Reinsert the item, which moves it to the end
+#     ls[0] = d
+#     return ls
+
+
+
+
+# # Function that preprocesses the inference data
+# def preprocess(event):    
+#     resp = get_realtime_transactions_aggregations()
+#     dist_event = calculate_distances(resp, event)
+#     converted_event = convert_timestamp_to_components(event)
+#     restructured_event = move_to_end(converted_event,'transaction_id')
+#     values_list = list(restructured_event[0].values())
+#     return_list = [values_list]
+#     return_list
+#     return_dict = {"inputs": return_list}
+#     return return_dict
+    
