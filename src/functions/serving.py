@@ -31,6 +31,11 @@ class XGBModelServer(mlrun.serving.V2ModelServer):
         """Generate model predictions from sample."""
 
         print(body)
+        # body['inputs'][0] = body['inputs'][0][1:]
+
+        # print(body)
+
+
 
         # Convert input to numpy array:
         data = np.asarray(body["inputs"])
