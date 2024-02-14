@@ -6,6 +6,8 @@ import mlrun
 import numpy as np
 import xgboost as xgb
 from cloudpickle import load
+import mlrun.feature_store as fstore
+
 
 warnings.filterwarnings("ignore")
 
@@ -27,6 +29,13 @@ class XGBModelServer(mlrun.serving.V2ModelServer):
 
     def predict(self, body: dict) -> List:
         """Generate model predictions from sample."""
+
+        print(body)
+        # body['inputs'][0] = body['inputs'][0][1:]
+
+        # print(body)
+
+
 
         # Convert input to numpy array:
         data = np.asarray(body["inputs"])

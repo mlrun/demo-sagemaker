@@ -56,6 +56,8 @@ def evaluate(
     # convert to pandas dataframe:
     test_set = pd.read_csv(test_set_temp_path)
 
+    print(test_set)
+
     # convert to xgboost object:
     test_data = xgb.DMatrix(test_set.drop(columns=[label_column], axis=1))
 
