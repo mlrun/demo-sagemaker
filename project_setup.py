@@ -93,6 +93,14 @@ def _set_functions(project: mlrun.projects.MlrunProject):
     # Serving
     _set_function(
         project=project,
+        func="src/functions/data-preparation.py",
+        name="data-preparation",
+        kind="job",
+    )
+
+    # Serving
+    _set_function(
+        project=project,
         func="src/functions/serving.py",
         name="serving",
         kind="serving",
