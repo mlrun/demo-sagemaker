@@ -1,0 +1,46 @@
+name: Deploy Workflow
+on: 
+  workflow_dispatch:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - staging
+      - master
+
+jobs:
+  deploy-workflow:
+    name: deploy-model
+    runs-on: ubuntu-latest  
+    environment: ${{ github.ref_name }}
+    container:
+      image: mlrun/mlrun:1.6.0-rc26
+      options: --user 1001
+    
+    steps:
+    - uses: actions/checkout@v2
+    - name: Create env file
+      run: |
+        >| mlrun.env
+        echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} >> mlrun.env
+        echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> mlrun.env
+        echo "AWS_DEFAULT_REGION=${{ secrets.AWS_DEFAULT_REGION }}" >> mlrun.env
+        echo SAGEMAKER_ROLE=${{ secrets.SAGEMAKER_ROLE }} >> mlrun.env
+    - name: Deploy model
+      run: |
+        python project_run.py \
+          --project-name sagemaker \
+          --workflow-name sagemaker \
+          --repo ${{ github.repositoryUrl }} \
+          --branch ${{ github.ref_name }} \
+          --single-cluster-mode
+      env:
+        V3IO_USERNAME: ${{ vars.V3IO_USERNAME }}
+#        V3IO_USERNAME: ${{ secrets.V3IO_USERNAME }}
+#        V3IO_API: ${{ secrets.V3IO_API }}
+        V3IO_ACCESS_KEY: ${{ secrets.V3IO_ACCESS_KEY }}
+        MLRUN_DBPATH: ${{ secrets.MLRUN_DBPATH }}
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+#        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        CMD: ${{ github.event.comment.body}}  
+        COMMIT: ${{ github.sha}}
