@@ -10,19 +10,19 @@ def train(context):
     # Set AWS environment variables:
     _set_envars(context)
 
-    # Get data from feature-store:
-    data = _get_feature_store_data(context)
-
-    # Randomly sort the data then split out first 70%, second 20%, and last 10%
-    train_data, validation_data, test_data = np.split(
-        data.sample(frac=1, random_state=42),
-        [int(0.7 * len(data)), int(0.9 * len(data))],
-    )
-
-    # Save the data locally:
-    train_data.to_csv("train.csv", index=False, header=False)
-    validation_data.to_csv("validation.csv", index=False, header=False)
-    test_data.to_csv("test.csv", index=False, header=True)
+    # # Get data from feature-store:
+    # data = _get_feature_store_data(context)
+    #
+    # # Randomly sort the data then split out first 70%, second 20%, and last 10%
+    # train_data, validation_data, test_data = np.split(
+    #     data.sample(frac=1, random_state=42),
+    #     [int(0.7 * len(data)), int(0.9 * len(data))],
+    # )
+    #
+    # # Save the data locally:
+    # train_data.to_csv("train.csv", index=False, header=False)
+    # validation_data.to_csv("validation.csv", index=False, header=False)
+    # test_data.to_csv("test.csv", index=False, header=True)
 
     # Setting up a session:
     region = sagemaker.Session().boto_region_name
@@ -101,19 +101,19 @@ def _set_envars(context):
     os.environ["AWS_DEFAULT_REGION"] = context.get_secret("AWS_DEFAULT_REGION")
     os.environ["SAGEMAKER-ROLE"] = context.get_secret("SAGEMAKER-ROLE")
 
-
-def _get_feature_store_data(context):
-    project_name = context.project
-    features = [
-        f"{project_name}/transactions.*",
-    ]
-
-    vector = fs.FeatureVector(
-        "transactions", features=features, description="enriched transactions"
-    )
-    resp = fs.FeatureVector.get_offline_features(vector)
-
-    # Preview the dataset
-    df = resp.to_dataframe()
-
-    return df
+#
+# def _get_feature_store_data(context):
+#     project_name = context.project
+#     features = [
+#         f"{project_name}/transactions.*",
+#     ]
+#
+#     vector = fs.FeatureVector(
+#         "transactions", features=features, description="enriched transactions"
+#     )
+#     resp = fs.FeatureVector.get_offline_features(vector)
+#
+#     # Preview the dataset
+#     df = resp.to_dataframe()
+#
+#     return df
