@@ -38,6 +38,22 @@ def evaluate(
     label_column: str,
     factorize_key: dict = None,
 ) -> pd.DataFrame:
+    """
+    Evaluate a trained model on a test set.
+
+    Parameters:
+    model_path (str): The path to the trained model.
+    model_name (str): The name of the model file.
+    test_set (Union[mlrun.DataItem, str]): The test set data. It can be either a mlrun.DataItem object or a string
+      representing the path to the test set file.
+    label_column (str): The name of the label column in the test set.
+    factorize_key (dict, optional): A dictionary mapping the target labels to their corresponding names. Defaults to
+      the transaction categories.
+
+    Returns:
+    pd.DataFrame: The classification report as a pandas DataFrame.
+    """
+
     # download model from s3:
     if model_path.startswith("store://"):
         model_path = mlrun.get_dataitem(model_path).get().decode("utf-8")

@@ -26,12 +26,15 @@ class XGBModelServer(mlrun.serving.V2ModelServer):
         self.model = load(open("xgboost-model", "rb"))
 
     def predict(self, body: dict) -> List:
-        """Generate model predictions from sample."""
+        """
+        Generate model predictions from data input.
 
-        print(body)
-        # body['inputs'][0] = body['inputs'][0][1:]
+        Args:
+            body (dict): The input data for prediction.
 
-        # print(body)
+        Returns:
+            The model predictions as a list.
+        """
 
         # Convert input to numpy array:
         data = np.asarray(body["inputs"])
@@ -60,7 +63,14 @@ class XGBModelServer(mlrun.serving.V2ModelServer):
 def postprocess(inputs: dict) -> dict:
     """
     Postprocessing the output of the model
+
+    Args:
+        inputs (dict): The input dictionary containing the model outputs.
+
+    Returns:
+        dict: The postprocessed output dictionary with predictions and confidences.
     """
+
     # Read the prediction:
     print(inputs)
     outputs = np.asarray(inputs.pop("outputs"))

@@ -6,7 +6,7 @@ on:
       - closed
     branches:
       - staging
-      - master
+      - main
 
 jobs:
   deploy-workflow:
