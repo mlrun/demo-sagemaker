@@ -20,7 +20,7 @@ import mlrun
 )
 @click.option(
     "--branch",
-    type=click.Choice(["development", "staging", "master"]
+    type=click.Choice(["development", "staging", "main"]
 ),
     required=True,
     help="Specify the branch - only relevant when using git source.",
@@ -37,7 +37,7 @@ def main(
 ) -> None:
 
     user_project = (
-        True if single_cluster_mode and branch in ["staging", "master"] else False
+        True if single_cluster_mode and branch in ["staging", "main"] else False
     )
 
     source = f"{repo}#{branch}"
