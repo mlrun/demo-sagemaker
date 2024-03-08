@@ -1,10 +1,11 @@
 import os
+import time
+
 import boto3
 import numpy as np
-import sagemaker
 import pandas as pd
+import sagemaker
 from sagemaker.feature_store.feature_group import FeatureGroup
-import time
 
 
 def data_prepare(context):

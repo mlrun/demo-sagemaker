@@ -3,11 +3,10 @@ import warnings
 from typing import List
 
 import mlrun
+import mlrun.feature_store as fstore
 import numpy as np
 import xgboost as xgb
 from cloudpickle import load
-import mlrun.feature_store as fstore
-
 
 warnings.filterwarnings("ignore")
 
