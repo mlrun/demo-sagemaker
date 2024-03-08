@@ -35,8 +35,6 @@ class XGBModelServer(mlrun.serving.V2ModelServer):
 
         # print(body)
 
-
-
         # Convert input to numpy array:
         data = np.asarray(body["inputs"])
 
