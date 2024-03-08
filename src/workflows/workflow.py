@@ -19,7 +19,7 @@ def kfpipeline():
     )
 
     # Evaluate
-    evaluate_run = project.run_function(
+    project.run_function(
         function="evaluate",
         name="evaluate",
         handler="evaluate",
