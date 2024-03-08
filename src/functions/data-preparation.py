@@ -82,7 +82,7 @@ def data_prepare(context):
         service_name="sagemaker-featurestore-runtime", region_name=region
     )
 
-    feature_store_session = sagemaker.Session(
+    sagemaker.Session(
         boto_session=boto_session,
         sagemaker_client=sm_client,
         sagemaker_featurestore_runtime_client=featurestore_runtime,

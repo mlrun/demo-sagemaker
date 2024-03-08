@@ -1,8 +1,6 @@
 import os
 
 import boto3
-import mlrun.feature_store as fs
-import numpy as np
 import sagemaker
 
 
