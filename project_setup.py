@@ -13,6 +13,7 @@
 # limitations under the License.
 import mlrun
 
+ENV_FILE_PATH = "mlrun.env"
 
 def setup(
     project: mlrun.projects.MlrunProject,
@@ -57,9 +58,9 @@ def setup(
 
 def _set_secrets(project: mlrun.projects.MlrunProject):
     # Set the secrets:
-    project.set_secrets(file_path="mlrun.env")
+    project.set_secrets(file_path=ENV_FILE_PATH)
     # Set as environment variables:
-    mlrun.set_env_from_file("mlrun.env")
+    mlrun.set_env_from_file(ENV_FILE_PATH)
 
 
 def _build_image(project: mlrun.projects.MlrunProject):
@@ -87,6 +88,14 @@ def _set_functions(project: mlrun.projects.MlrunProject):
         project=project,
         func="src/functions/evaluate.py",
         name="evaluate",
+        kind="job",
+    )
+
+    # Serving
+    _set_function(
+        project=project,
+        func="src/functions/data-preparation.py",
+        name="data-preparation",
         kind="job",
     )
 
