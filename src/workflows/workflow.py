@@ -3,10 +3,15 @@ from kfp import dsl
 
 
 @dsl.pipeline(
-    name="Fraud Detection Pipeline",
-    description="Detecting fraud from a transactions dataset",
+    name="Classify payment Pipeline",
+    description="Classify payment from a transactions dataset",
 )
 def kfpipeline():
+    """
+    This function defines a Kubeflow Pipeline for payment classification.
+    It trains a model using SageMaker, evaluates its performance, sets up a serving function,
+    and deploys the serving function.
+    """
     project = mlrun.get_current_project()
 
     # Train
@@ -19,7 +24,7 @@ def kfpipeline():
     )
 
     # Evaluate
-    evaluate_run = project.run_function(
+    project.run_function(
         function="evaluate",
         name="evaluate",
         handler="evaluate",
