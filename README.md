@@ -43,3 +43,9 @@ Additionally, set the `V3IO_USERNAME` environment variable to your username.
 3. **Commit and Push Your Changes**: Make any necessary changes to the code, then commit and push these changes to your repository. 
 
 4. **Create a Pull Request**: Create a pull request to either the `staging` or `main` branch. Once the pull request is merged, it will trigger the GitHub action. You can review the pipeline execution in the MLRun UI, a link to which can be found in the workflow steps.
+
+You can also run the workflow manually by navigating to the "Actions" tab in your repository and clicking on the workflow.
+
+## License
+
+This demo is licensed under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0). For more details, please take a look at the [LICENSE](./LICENSE) file.
