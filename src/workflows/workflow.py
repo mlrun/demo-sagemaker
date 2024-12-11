@@ -20,7 +20,7 @@ def kfpipeline():
         name="train",
         handler="train",
         params={},
-        outputs=["model_path", "test_data"],
+        outputs=["model_path", "model", "test_data"],
     )
 
     # Evaluate
@@ -39,17 +39,14 @@ def kfpipeline():
 
     serving_function = project.get_function("serving")
 
-    if serving_function.spec.graph is not None:
-        # If serving graph is already set, we need to remove it and set it again:
-        serving_function = project.set_function(serving_function)
+    if serving_function.spec.graph is None:
+        # Set the topology and get the graph object:
+        graph = serving_function.set_topology("flow", engine="async")
 
-    # Set the topology and get the graph object:
-    graph = serving_function.set_topology("flow", engine="async")
-
-    # Add the steps:
-    graph.to("XGBModelServer", name="xgboost-model").to(
-        handler="postprocess", name="postprocess"
-    ).respond()
+        # Add the steps:
+        graph.to("XGBModelServer", name="xgboost-model").to(
+            handler="postprocess", name="postprocess"
+        ).respond()
 
     # Deploy the serving function:
     project.deploy_function(serving_function).after(train_run)

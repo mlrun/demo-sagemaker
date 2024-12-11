@@ -11,6 +11,7 @@ def train(context):
     # Setting up a session:
     region = sagemaker.Session().boto_region_name
     sm_client = boto3.client("sagemaker")
+    s3 = boto3.client("s3")
     boto_session = boto3.Session(region_name=region)
     sagemaker_session = sagemaker.session.Session(
         boto_session=boto_session, sagemaker_client=sm_client
@@ -61,6 +62,11 @@ def train(context):
 
     # Save the model's path:
     context.log_artifact("model_path", body=xgb.model_data)
+
+    # log the model:
+    bucket, key = xgb.model_data.replace("s3://", "").split("/", 1)
+    s3.download_file(bucket, key, 'model.tar.gz')
+    context.log_model('my-model', model_file='model.tar.gz')
 
     # Save the test data path:
     context.log_artifact(
