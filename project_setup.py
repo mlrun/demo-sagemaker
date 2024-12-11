@@ -65,10 +65,11 @@ def _set_secrets(project: mlrun.projects.MlrunProject):
 
 def _build_image(project: mlrun.projects.MlrunProject):
     assert project.build_image(
+        image=project.default_image,
         base_image="mlrun/mlrun",
-        commands=[
-            "pip install sagemaker",
-            "pip install xgboost",
+        requirements=[
+            "sagemaker",
+            "xgboost",
         ],
         set_as_default=True,
     )
