@@ -119,6 +119,7 @@ def _set_function(
         func=func,
         name=name,
         kind=kind,
+        image=project.default_image
     )
 
     # Save:
