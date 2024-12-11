@@ -68,8 +68,8 @@ def _build_image(project: mlrun.projects.MlrunProject):
         image=project.default_image,
         base_image="mlrun/mlrun",
         requirements=[
-            "sagemaker",
             "xgboost",
+            "sagemaker==2.227.0"
         ],
         set_as_default=True,
     )
