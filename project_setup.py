@@ -38,7 +38,7 @@ def setup(
         print("Building default image for the demo:")
         _build_image(project=project)
     else:
-        project.set_default_image(default_image)
+        project.set_default_image(f'.mlrun-project-image-{project.name}')
 
     # Set the project git source:
     if source:
