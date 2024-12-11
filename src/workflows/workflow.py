@@ -44,7 +44,7 @@ def kfpipeline():
         graph = serving_function.set_topology("flow", engine="async")
 
         # Add the steps:
-        graph.to("XGBModelServer", name="xgboost-model").to(
+        graph.to("XGBModelServer", name="xgboost-model", model_path=project.get_artifact('train_my-model').target_path).to(
             handler="postprocess", name="postprocess"
         ).respond()
 
