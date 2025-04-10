@@ -67,9 +67,10 @@ def _build_image(project: mlrun.projects.MlrunProject):
     assert project.build_image(
         base_image="mlrun/mlrun",
         commands=[
-            "pip install sagemaker",
-            "pip install xgboost",
-            "pip install tarsafe",
+            "pip install -U sagemaker",
+            "pip install -U xgboost",
+            "pip install -U tarsafe",
+            "pip install -U aiobotocore",
         ],
         set_as_default=True,
     )
