@@ -69,6 +69,7 @@ def _build_image(project: mlrun.projects.MlrunProject):
         commands=[
             "pip install sagemaker",
             "pip install xgboost",
+            "pip install tarsafe",
         ],
         set_as_default=True,
     )

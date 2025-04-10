@@ -1,4 +1,4 @@
-import tarfile
+import os
 import warnings
 from typing import List
 
@@ -6,8 +6,10 @@ import mlrun
 import numpy as np
 import xgboost as xgb
 from cloudpickle import load
+from tarsafe import TarSafe
 
 warnings.filterwarnings("ignore")
+    
 
 
 class XGBModelServer(mlrun.serving.V2ModelServer):
@@ -18,9 +20,16 @@ class XGBModelServer(mlrun.serving.V2ModelServer):
         # Download the model file:
         model_file, extra_data = self.get_model(".tar.gz")
 
-        # Extract model file:
-        t = tarfile.open(model_file, "r:gz")
-        t.extractall()
+        with TarSafe.open(model_file, "r") as tar:
+            for member in tar.getmembers():
+                member_path = os.path.join(".", member.name)
+    
+                # Prevent path traversal
+                if not os.path.realpath(member_path).startswith(os.path.realpath(".")):
+                    raise Exception(f"Unsafe path detected in tar: {member.name}")
+                    
+            tar.extractall()
+
 
         # Load model from file:
         self.model = load(open("xgboost-model", "rb"))

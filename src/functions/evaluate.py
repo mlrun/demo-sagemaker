@@ -1,6 +1,7 @@
-import tarfile
 import tempfile
 from typing import Union
+from tarsafe import TarSafe
+import os
 
 import mlrun
 import pandas as pd
@@ -60,8 +61,15 @@ def evaluate(
     model_temp_path = _download_object_from_s3(model_path, suffix=".tar.gz")
 
     # extract model file:
-    t = tarfile.open(model_temp_path, "r:gz")
-    t.extractall()
+    with TarSafe.open(model_temp_path, "r") as tar:
+        for member in tar.getmembers():
+            member_path = os.path.join(".", member.name)
+
+            # Prevent path traversal
+            if not os.path.realpath(member_path).startswith(os.path.realpath(".")):
+                raise Exception(f"Unsafe path detected in tar: {member.name}")
+                
+        tar.extractall()
 
     # load model from file:
     model = load(open(model_name, "rb"))
