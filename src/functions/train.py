@@ -38,7 +38,7 @@ def train(context):
         container,
         role,
         instance_count=1,
-        instance_type="ml.m4.xlarge",
+        instance_type="ml.m5.xlarge",
         output_path="s3://{}/{}/output".format(s3_bucket, bucket_prefix),
         sagemaker_session=sagemaker_session,
     )
