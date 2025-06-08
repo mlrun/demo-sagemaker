@@ -31,14 +31,8 @@ def setup(
 
     # Unpack parameters:
     source = project.get_param(key="source")
-    default_image = project.get_param(key="default_image")
 
-    # Set or build the default image:
-    if default_image is None and not project.spec.build.image:
-        print("Building default image for the demo:")
-        _build_image(project=project)
-    else:
-        project.set_default_image(default_image)
+    _build_image(project=project)
 
     # Set the project git source:
     if source:
@@ -71,6 +65,7 @@ def _build_image(project: mlrun.projects.MlrunProject):
             "pip install -U xgboost",
             "pip install -U tarsafe",
             "pip install -U aiobotocore",
+            "pip install -U mlrun[complete]",
         ],
         set_as_default=True,
     )
